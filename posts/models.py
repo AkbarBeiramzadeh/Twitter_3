@@ -23,6 +23,7 @@ class Post(TimeStampMixin, SoftDeleteModel):
 
     title = models.CharField(verbose_name=_("Title"), max_length=124)
     text = models.TextField(verbose_name=_("Body"), help_text=_("Text to display"))
+    slug = models.SlugField()
     user = models.ForeignKey(
         "accounts.User",
         on_delete=models.CASCADE,
@@ -33,10 +34,10 @@ class Post(TimeStampMixin, SoftDeleteModel):
         choices=Statuses.choices,
         default=Statuses.PUBLISHED,
     )
-    tags = models.ManyToManyField(Tag, related_name="posts")
+    tags = models.ManyToManyField(Tag, related_name="posts", blank=True)
 
-    def get_url(self):
-        return reverse('contents:detail', args=(self.id,))
+    def get_absolute_url(self):
+        return reverse('posts:post_detail', args=(self.id, self.slug))
 
     def __str__(self) -> str:
         return self.text
@@ -44,6 +45,15 @@ class Post(TimeStampMixin, SoftDeleteModel):
     class Meta:
         verbose_name = _("Post")
         verbose_name_plural = _("Posts")
+
+    def likes_count(self):
+        return self.pvotes.count()
+
+    def user_can_like(self, user):
+        user_like = user.uvotes.filter(post=self)
+        if user_like.exists():
+            return True
+        return False
 
 
 class Image(BaseModel):
@@ -64,5 +74,8 @@ class Comment(TimeStampMixin, BaseModel):
 
 
 class Reaction(BaseModel):
-    user = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    user = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name='uvotes')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='pvotes')
+
+    def __str__(self):
+        return f'{self.user} liked {self.post.slug}'

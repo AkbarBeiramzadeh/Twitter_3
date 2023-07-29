@@ -16,15 +16,16 @@ class PostAdmin(admin.ModelAdmin):
     fieldsets = (
         (
             None, {
-                'fields': ('title', 'text', ('user', 'status', 'is_deleted'), 'tags'),
+                'fields': ('title', 'text', 'slug', ('user', 'status', 'is_deleted'), 'tags'),
             },
         ),
     )
     inlines = [ImageInLine]
-    list_display = ["text", "user", "status"]
+    list_display = ["text", "user", "status", "slug"]
     search_fields = ["text"]
     list_filter = ["status"]
     actions = ["published_posts"]
+    prepopulated_fields = {'slug': ('text',)}
 
     @admin.action(description="This Action is Published Selected Post")
     def published_posts(self, request, queryset):

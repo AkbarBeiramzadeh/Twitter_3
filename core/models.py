@@ -4,7 +4,7 @@ from django.db.models.query import QuerySet
 
 
 class BaseModel(models.Model):
-    id = models.UUIDField(primary_key=True, editable=False, default=uuid4)
+    # id = models.UUIDField(primary_key=True, editable=False, default=uuid4)
 
     class Meta:
         abstract = True
