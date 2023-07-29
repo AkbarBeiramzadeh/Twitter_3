@@ -63,14 +63,15 @@ class Image(BaseModel):
 
 class Comment(TimeStampMixin, BaseModel):
     text = models.CharField(max_length=128)
-    user = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    user = models.ForeignKey("accounts.User", on_delete=models.CASCADE, related_name='ucomments')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='pcomments')
     reply_to = models.ForeignKey(
         "self",
         null=True,
         blank=True,
         on_delete=models.CASCADE,
     )
+    is_reply = models.BooleanField(default=False)
 
 
 class Reaction(BaseModel):
