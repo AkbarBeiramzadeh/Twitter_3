@@ -16,3 +16,53 @@ class Tag(BaseModel):
         return self.text
 
 
+class Post(TimeStampMixin, SoftDeleteModel):
+    class Statuses(models.TextChoices):
+        DRAFT = "D", _("Draft")
+        PUBLISHED = "P", _("Published")
+
+    title = models.CharField(verbose_name=_("Title"), max_length=124)
+    text = models.TextField(verbose_name=_("Body"), help_text=_("Text to display"))
+    user = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.CASCADE,
+        related_name="posts",
+    )
+    status = models.CharField(
+        max_length=1,
+        choices=Statuses.choices,
+        default=Statuses.PUBLISHED,
+    )
+    tags = models.ManyToManyField(Tag, related_name="posts")
+
+    def get_url(self):
+        return reverse('contents:detail', args=(self.id,))
+
+    def __str__(self) -> str:
+        return self.text
+
+    class Meta:
+        verbose_name = _("Post")
+        verbose_name_plural = _("Posts")
+
+
+class Image(BaseModel):
+    photo = models.FileField(upload_to="posts/images/")
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="images")
+
+
+class Comment(TimeStampMixin, BaseModel):
+    text = models.CharField(max_length=128)
+    user = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    reply_to = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+    )
+
+
+class Reaction(BaseModel):
+    user = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
