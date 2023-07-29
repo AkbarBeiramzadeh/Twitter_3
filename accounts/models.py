@@ -23,8 +23,8 @@ class User(AbstractUser):
 
 
 class Relation(models.Model):
-    from_user = models.ForeignKey(User,on_delete=models.CASCADE,related_name="followings",)
-    to_user = models.ForeignKey(User,on_delete=models.CASCADE,related_name="followers",)
+    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="followings", )
+    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="followers", )
 
     class Meta:
         verbose_name = _("Relation")
