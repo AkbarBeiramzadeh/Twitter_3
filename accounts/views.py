@@ -83,25 +83,6 @@ class UserProfileView(LoginRequiredMixin, View):
         return render(request, 'accounts/profile.html', {'user': user, 'posts': posts, 'is_following': is_following})
 
 
-class UserPasswordResetView(auth_views.PasswordResetView):
-    template_name = 'accounts/password_reset_form.html'
-    success_url = reverse_lazy('account:password_reset_done')
-    email_template_name = 'account/password_reset_email.html'
-
-
-class UserPasswordResetDoneView(auth_views.PasswordResetDoneView):
-    template_name = 'accounts/password_reset_done.html'
-
-
-class UserPasswordResetConfirmView(auth_views.PasswordResetConfirmView):
-    template_name = 'accounts/password_reset_confirm.html'
-    success_url = reverse_lazy('account:password_reset_complete')
-
-
-class UserPasswordResetCompleteView(auth_views.PasswordResetCompleteView):
-    template_name = 'accountspassword_reset_complete.html'
-
-
 class UserFollowView(LoginRequiredMixin, View):
     def dispatch(self, request, *args, **kwargs):
         user = User.objects.get(id=kwargs['user_id'])
